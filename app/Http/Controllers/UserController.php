@@ -25,6 +25,18 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $validation = Validator::make($request->all(), [
+            'name'     => 'required',
+            'email'    => 'required|email|unique:users,email',
+            'password' => 'required|min:8',
+            'phone'     => 'required',
+            'address'     => 'required',
+            'city'     => 'required',
+            'pin_code'     => 'required',
+        ]);
+        if ($validation->fails()) {
+            return errorResponse($validation->errors()->first());
+        }
         $user = User::find($id);
         if (!$user) {
             return errorResponse('User not found');

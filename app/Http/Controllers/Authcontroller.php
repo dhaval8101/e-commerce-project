@@ -25,18 +25,21 @@ class Authcontroller extends Controller
             'name'     => 'required',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|min:8',
+            'phone'     => 'required',
+            'address'     => 'required',
+            'city'     => 'required',
+            'pin_code'     => 'required',
         ]);
         if ($validation->fails()) {
             return errorResponse($validation->errors()->first());
         }
         $user = new User();
         $user->name = $request->name;
-        $user->email = $request->lastnameemail;
+        $user->email = $request->email;
         $user->phone = $request->phone;
         $user->address = $request->address;
         $user->city = $request->city;
         $user->pin_code = $request->pin_code;
-        $user->email = $request->email;
         $user->password = Hash::make($request->password);
         $user->save();
         Mail::to($user->email)->send(new WelcomeMail($user));
