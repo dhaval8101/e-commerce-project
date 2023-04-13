@@ -34,9 +34,9 @@ class UserController extends Controller
      */
     public function delete($id)
     {
-        $subcategory = User::where('id', $id)->first();
-        if ($subcategory) {
-            $subcategory->delete();
+        $user = User::where('id', $id)->first();
+        if ($user) {
+            $user->delete();
             return successResponse('User delete successfully');
         }
         return errorResponse('User Already Deleted');

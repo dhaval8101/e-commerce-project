@@ -17,7 +17,7 @@ class SubcategoryController extends Controller
         public function store(Request $request)
         {
             $validation = Validator::make($request->all(), [
-                'name' => 'required',
+                'name'        => 'required',
                 'category_id' => [
                     'required',
                     function($attribute, $value, $fail) {
@@ -54,7 +54,7 @@ class SubcategoryController extends Controller
     public function update(Request $request, $id)
     {
         $validation = Validator::make($request->all(), [
-            'name' => 'required',
+            'name'        => 'required',
             'category_id' => [
                 'required',
                 function($attribute, $value, $fail) {

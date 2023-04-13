@@ -6,17 +6,23 @@ use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Auth\AuthenticationException;
 
 class Handler extends ExceptionHandler
 {
     public function render($request, Throwable $exception)
     {
+        if ($exception instanceof AuthenticationException) {
+            return response()->json(['error' => 'Unauthorized token'], 401);
+        }
+    
         if ($request->expectsJson()) {
             return response()->json(['error' => 'Resource not found'], 400);
         }
     
         return parent::render($request, $exception);
     }
+    
 
     /**
      * A list of exception types with their corresponding custom log levels.

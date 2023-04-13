@@ -1,11 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Traits\SearchableTrait;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+
 class CategoryController extends Controller
 {
     use SearchableTrait;
@@ -23,7 +25,7 @@ class CategoryController extends Controller
         $category = new Category();
         $category->name = $request->name;
         $category->save();
-        return successResponse($category,'Category create successfully');
+        return successResponse($category, 'Category create successfully');
     }
     /**
      * Display the specified resource.
@@ -53,8 +55,8 @@ class CategoryController extends Controller
             return errorResponse('Category not found');
         }
         $category->update($request->all(['name']));
-        return successResponse($category,'Category update successfully');
-    }    
+        return successResponse($category, 'Category update successfully');
+    }
     /**
      * Remove the specified resource from storage.
      */

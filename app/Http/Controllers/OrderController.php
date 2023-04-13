@@ -33,12 +33,9 @@ class OrderController extends Controller
                 }
             ]
         ]);
-        
-        if ($validation->fails()) {
+          if ($validation->fails()) {
             return errorResponse($validation->errors()->first());
         }  
-    
-        // create order
         $order = new Order([
             'cart_id'    => $request->input('cart_id'),
             'product_id' => $request->input('product_id'),
@@ -46,11 +43,11 @@ class OrderController extends Controller
             'quantity'   => $request->input('quantity'),
             'price'      => $request->input('price'),
             'payment_method' => $request->input('payment_method'),
-            'status'    => $request->input('status'),
-            'phone'     => $request->input('phone'),
-            'address'   => $request->input('address'),
-            'city'      => $request->input('city'),
-            'pin_code'  => $request->input('pin_code')
+            'status'     => $request->input('status'),
+            'phone'      => $request->input('phone'),
+            'address'    => $request->input('address'),
+            'city'       => $request->input('city'),
+            'pin_code'   => $request->input('pin_code')
         ]);
         $order->save();
         return successResponse($order, 'order create successfully');

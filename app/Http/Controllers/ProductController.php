@@ -8,7 +8,6 @@ use App\Traits\SearchableTrait;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Category;
 use App\Models\SubCategory;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 class ProductController extends Controller
 {
     use SearchableTrait;
@@ -66,7 +65,6 @@ class ProductController extends Controller
         }
         return successResponse($product, 'product show successfully');
     }
-
     /**
      * Update the specified resource in storage.
      */
