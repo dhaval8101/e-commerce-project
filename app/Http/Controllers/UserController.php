@@ -26,6 +26,9 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $user = User::find($id);
+        if (!$user) {
+            return errorResponse('User not found');
+        }
         $user->update($request->only(['name', 'email', 'phone', 'password', 'city', 'address', 'pin_code', 'role']));
         return successResponse($user, 'User update successfully');
     }
