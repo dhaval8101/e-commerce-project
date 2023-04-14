@@ -31,6 +31,7 @@ Route::controller(Authcontroller::class)->group(function () {
     Route::post('/login', 'login')->name('login');
     Route::post('/forgotPasswordLink', 'forgotPasswordLink');
     Route::post('/forgotPassword', 'forgotPassword');
+    Route::get('/list', 'index');   
 });
 
 //User Api Route
@@ -68,10 +69,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
     //Order Api Route
     Route::controller(OrderController::class)->prefix('order')->group(function () {
-        Route::post('/store', 'store')->middleware('role:admin');
+        Route::post('/store', 'store')->middleware('role:user');
         Route::get('/show/{id}', 'show')->middleware('role:admin|user');
         Route::put('/update/{id}', 'update')->middleware('role:admin');
         Route::delete('/delete/{id}', 'delete')->middleware('role:admin');
+        Route::get('/list', 'index')->middleware('role:admin|user');
     });
     //Order Api Route
     Route::controller(CartController::class)->prefix('cart')->group(function () {
@@ -79,5 +81,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/show/{id}', 'show')->middleware('role:admin|user');
         Route::put('/update/{id}', 'update')->middleware('role:admin');
         Route::delete('/delete/{id}', 'delete')->middleware('role:admin');
+        Route::get('/list', 'index')->middleware('role:admin|user');
     });
 });

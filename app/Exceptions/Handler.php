@@ -7,6 +7,7 @@ use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class Handler extends ExceptionHandler
 {
@@ -16,8 +17,12 @@ class Handler extends ExceptionHandler
             return response()->json(['error' => 'Unauthorized token'], 401);
         }
     
+        if ($exception instanceof ModelNotFoundException) {
+            return response()->json(['error' => 'record not found'], 400);
+        }
+    
         if ($request->expectsJson()) {
-            return response()->json(['error' => 'Resource not found'], 400);
+            return response()->json(['error' => 'Resource not found'], 404);
         }
     
         return parent::render($request, $exception);

@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Traits\SearchableTrait;
 use App\Models\Cart;
 use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+
 class CartController extends Controller
-{   
+{
+    use SearchableTrait;
     /**
      * Store a newly created resource in storage.
      */
@@ -19,19 +23,19 @@ class CartController extends Controller
             'quantity'        => 'required|numeric',
             'product_id'      => [
                 'required',
-                function($attribute, $value, $fail) {
+                function ($attribute, $value, $fail) {
                     if (!Product::where('id', $value)->exists()) {
                         $fail('Invalid product_id.');
-                    
-                     } }
+                    }
+                }
             ],
         ]);
-        
+
         if ($validation->fails()) {
             return errorResponse($validation->errors()->first());
-        } 
+        }
         $cart = new Cart();
-        $cart->product_id= $request->product_id;
+        $cart->product_id = $request->product_id;
         $cart->user_id  = $request->user_id;
         $cart->quantity = $request->quantity;
         $cart->price    = $request->price;
@@ -41,13 +45,10 @@ class CartController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {   
-        $cart = Cart::find($id);
-        if (!$cart) {
-            return errorResponse('Cart not found');
-        }
-        return successResponse($cart, 'Cart show successfully');
+    public function show($id)
+    {
+        $cart = Cart::findOrFail($id);
+        return successResponse($cart, 'Cart details ');
     }
     /**
      * Update the specified resource in storage.
@@ -58,27 +59,25 @@ class CartController extends Controller
             'price'           => 'required|numeric',
             'user_id'         => 'required|exists:users,id',
             'quantity'        => 'required|numeric',
-            'product_id'     => [
+            'product_id'      => [
                 'required',
-                function($attribute, $value, $fail) {
+                function ($attribute, $value, $fail) {
                     if (!Product::where('id', $value)->exists()) {
                         $fail('Invalid product_id.');
-                    
-                     } 
                     }
+                }
             ],
-          ]);
-        
+        ]);
+
         if ($validation->fails()) {
             return errorResponse($validation->errors()->first());
-        } 
+        }
         $cart = Cart::find($id);
         if (!$cart) {
             return errorResponse('cart not found');
         }
         $cart->update($request->all(['product_id', 'user_id', 'quantity', 'price']));
         return successResponse($cart, 'Cart update successfully');
-
     }
 
     /**
@@ -86,12 +85,24 @@ class CartController extends Controller
      */
     public function delete($id)
     {
-        $cart = Cart::where('id', $id)->first();
+        $this->validate(request(), [
+            'per_page' => 'nullable|integer',
+            'page' => 'nullable|integer'
+        ]);
 
-        if ($cart) {
-            $cart->delete();
-            return successResponse('cart delete successfully');
+        $cart = Cart::findOrFail($id);
+        $cart->delete();
+        return successResponse($cart, 'Cart delete successfully');
+    }
+    //search and pagination 
+    public function index(Request $request)
+    {
+    $cart  = Cart::query();
+        if (Auth::user()->role == 'user') {
+            $user_id = Auth::user()->id;
+            $cart = $cart->where('user_id', $user_id);
         }
-        return errorResponse('cart Already Deleted');
+$cart = $cart->get();
+ return successResponse('user cart details', $cart);
     }
 }

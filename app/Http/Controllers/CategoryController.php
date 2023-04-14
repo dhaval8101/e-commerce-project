@@ -25,20 +25,16 @@ class CategoryController extends Controller
         $category = new Category();
         $category->name = $request->name;
         $category->save();
-        return successResponse($category, 'Category create successfully');
+        return successResponse($category, 'Category create Successfully');
     }
     /**
      * Display the specified resource.
      */
     public function show($id)
     {
-        try {
             $category = Category::findOrFail($id);
-            return successResponse($category, 'Category show successfully');
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['message' => 'Category not found'], 400);
-        }
-    }
+            return successResponse($category, 'Category details ');
+    } 
     /**
      * Update the specified resource in storage.
      */
@@ -62,24 +58,24 @@ class CategoryController extends Controller
      */
     public function delete($id)
     {
-        $category = Category::where('id', $id)->first();
-        if ($category) {
-            $category->delete();
-            return successResponse('Category delete successfully');
-        }
-        return errorResponse('Category Already Deleted');
+        $category = Category::findOrFail($id);
+        $category->delete();
+        return successResponse($category,'Category delete successfully');
     }
     //search and pagination 
-    public function index()
+    public function index(Request $request)
     {
-        $this->ListingValidation();
-        $query = Category::query();
-        $searchable_fields = ['name'];
-        $data = $this->serching($query, $searchable_fields);
-        return response()->json([
-            'success' => true,
-            'data'    => $data['query']->get(),
-            'total'   => $data['count']
+        // Validate input parameters
+        $this->validate(request(), [
+            'search' => 'nullable|string',
+            'per_page' => 'nullable|integer',
+            'page' => 'nullable|integer'
         ]);
+
+        // Define fields that can be searched
+        $searchable_fields = ['name'];
+
+        return $this->list($request, Category::class, $searchable_fields);
     }
+
 }

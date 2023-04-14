@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 class OrderController extends Controller
 {
@@ -57,12 +58,9 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        $order = Order::find($id);
-        if (!$order) {
-            return errorResponse('order not found');
-        }
-        return successResponse($order, 'order show successfully');
-    }
+            $order = Order::findOrFail($id);
+            return successResponse($order, 'order details ');
+    } 
     /**
      * Update the specified resource in storage.
      */
@@ -104,12 +102,19 @@ class OrderController extends Controller
      */
     public function delete($id)
     {
-        $order = Order::where('id', $id)->first();
-
-        if ($order) {
-            $order->delete();
-            return successResponse('order delete successfully');
-        }
-        return errorResponse('order Already Deleted');
+        $order = Order::findOrFail($id);
+        $order->delete();
+        return successResponse($order,'order delete successfully');
     }
-}
+        //search and pagination 
+        public function index(Request $request)
+        {
+        $cart  = Order::query();
+            if (Auth::user()->role == 'user') {
+                $user_id = Auth::user()->id;
+                $cart = $cart->where('user_id', $user_id);
+            }
+    $cart = $cart->get();
+     return successResponse('user cart details', $cart);
+        }
+    }

@@ -84,14 +84,16 @@ class Authcontroller extends Controller
             'token' => $token,
             'email' => $request->email
         ]);
-        return "Mail Sent Successfully";
+        return response()->json([
+            'message' => 'Password reset email has been sent successfully'
+        ]);
+        
     }
       // user forgot password
       public function forgotPassword(Request $request)
       {
         $validation = Validator::make($request->all(), [
             'token'     => 'required|exists:password_resets,token',
-            'email'     => 'required|exists:password_resets,email|exists:users,email',
             'password'  => 'required|min:8|confirmed',
             'password_confirmation' => 'required'
         ]);

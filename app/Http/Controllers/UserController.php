@@ -18,7 +18,7 @@ class UserController extends Controller
         if (!$user) {
             return errorResponse('User not found', 404);
         }
-        return successResponse($user, 'User show successfully');
+        return successResponse($user, 'User details ');
     }
     /**
      * Update the specified resource in storage.

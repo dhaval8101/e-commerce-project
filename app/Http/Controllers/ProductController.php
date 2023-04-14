@@ -52,19 +52,16 @@ class ProductController extends Controller
         $product->category_id = $request->category_id;
         $product->sub_category_id = $request->sub_category_id;
         $product->save();
-        return successResponse($product,'product  create  successfully');
+        return successResponse($product,'product  create Successfully ');
     }
     /**
      * Display the specified resource.
      */
     public function show($id)
     {
-        $product = Product::find($id);
-        if (!$product) {
-            return errorResponse('product not found');
-        }
-        return successResponse($product, 'product show successfully');
-    }
+            $product = Product::findOrFail($id);
+            return successResponse($product, 'product details ');
+    } 
     /**
      * Update the specified resource in storage.
      */
@@ -104,7 +101,7 @@ class ProductController extends Controller
         }
 
         $product->update($request->all(['name', 'price', 'description', 'quantity', 'category_id', 'sub_category_id']));
-        return successResponse($product, 'product update successfully');
+        return successResponse($product, 'product update Successfully');
     }
 
     /**
@@ -112,24 +109,25 @@ class ProductController extends Controller
      */
     public function delete($id)
     {
-        $product = Product::where('id', $id)->first();
-        if ($product) {
-            $product->delete();
-            return successResponse('product delete successfully');
-        }
-        return errorResponse('product Already Deleted');
+        $product = Product::findOrFail($id)->delete();
+        return successResponse($product,'product delete Successfully');
     }
+
     //search and pagination 
     public function index(Request $request)
     {
-        $this->ListingValidation();
-        $query = Product::query();
-        $searchable_fields = ['name'];
-        $data = $this->serching($query, $searchable_fields);
-        return response()->json([
-            'success' => true,
-            'data'    => $data['query']->get(),
-            'total'   => $data['count']
+        // Validate input parameters
+        $this->validate(request(), [
+            'category_id' => 'nullable|integer',
+            'sub_category_id' => 'nullable|integer',
+            'search' => 'nullable|string',
+            'per_page' => 'nullable|integer',
+            'page' => 'nullable|integer'
         ]);
+
+        // Define fields that can be searched
+        $searchable_fields = ['sub_category_id','category_id','name'];
+
+        return $this->list($request, Product::class, $searchable_fields);
     }
 }
