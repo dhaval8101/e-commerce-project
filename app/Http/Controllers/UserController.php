@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+
 class UserController extends Controller
 {
     /**
@@ -14,10 +15,7 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        $user = User::find($id);
-        if (!$user) {
-            return errorResponse('User not found', 404);
-        }
+        $user = User::findOrFail($id);
         return successResponse($user, 'User details ');
     }
     /**
@@ -37,10 +35,7 @@ class UserController extends Controller
         if ($validation->fails()) {
             return errorResponse($validation->errors()->first());
         }
-        $user = User::find($id);
-        if (!$user) {
-            return errorResponse('User not found');
-        }
+        $user = User::findOrFail($id);
         $user->update($request->only(['name', 'email', 'phone', 'password', 'city', 'address', 'pin_code', 'role']));
         return successResponse($user, 'User update successfully');
     }

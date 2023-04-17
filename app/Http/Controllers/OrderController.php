@@ -38,19 +38,18 @@ class OrderController extends Controller
           if ($validation->fails()) {
             return errorResponse($validation->errors()->first());
         }  
-        $order = new Order([
-            'cart_id'    => $request->input('cart_id'),
-            'product_id' => $request->input('product_id'),
-            'user_id'    => $request->input('user_id'),
-            'quantity'   => $request->input('quantity'),
-            'price'      => $request->input('price'),
-            'payment_method' => $request->input('payment_method'),
-            'status'     => $request->input('status'),
-            'phone'      => $request->input('phone'),
-            'address'    => $request->input('address'),
-            'city'       => $request->input('city'),
-            'pin_code'   => $request->input('pin_code')
-        ]);
+        $order = new Order();
+        $order -> cart_id=$request->cart_id;
+        $order -> product_id = $request->product_id;
+        $order -> user_id = $request->user_id;
+        $order -> quantity =$request->quantity;
+        $order -> price = $request->price;
+        $order -> payment_method = $request->payment_method;
+        $order -> status=$request->status;
+        $order -> phone = $request->phone;
+        $order -> address = $request->address;
+        $order -> city=$request->city;
+        $order -> pin_code = $request->pin_code;
         $order->save();
         return successResponse($order, 'order create successfully');
     }
@@ -89,10 +88,7 @@ class OrderController extends Controller
     if ($validation->fails()) {
         return errorResponse($validation->errors()->first());
     }  
-        $order = Order::find($id);
-        if (!$order) {
-            return errorResponse('order not found');
-        }
+        $order = Order::findOrFail($id);
         $order->update($request->all(['cart_id', 'product_id', 'user_id', 'quantity', 'price', 'payment_method', 'status', 'phone', 'address', 'city', 'pin_code']));
         return successResponse($order, 'order update successfully');
     }

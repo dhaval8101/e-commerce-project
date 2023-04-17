@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\SubCategory;
 use App\Traits\SearchableTrait;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Models\Category;
 
 class SubcategoryController extends Controller
@@ -43,8 +42,8 @@ class SubcategoryController extends Controller
      */
     public function show($id)
     {
-            $subcategory = SubCategory::findOrFail($id);
-            return successResponse($subcategory, 'Subcategory details ');
+        $subcategory = SubCategory::findOrFail($id);
+        return successResponse($subcategory, 'Subcategory details ');
     } 
     /**
      * Update the specified resource in storage.
@@ -65,10 +64,7 @@ class SubcategoryController extends Controller
         if ($validation->fails()) {
             return errorResponse($validation->errors()->first());
         }
-        $subcategory = SubCategory::find($id);
-        if (!$subcategory) {
-            return errorResponse('Subcategory not found');
-        }
+        $subcategory = SubCategory::findOrFail($id);
         $subcategory->update($request->all(['name', 'category_id']));
         return successResponse($subcategory, 'Subcategory update Successfully');
     }
@@ -94,7 +90,6 @@ class SubcategoryController extends Controller
         ]);
         $subcategory = SubCategory::query()->orderBy('id', 'desc');
         $searchable_fields = ['category_id','name'];
-
         return $this->list($request, $subcategory, $searchable_fields);
     }    
 }

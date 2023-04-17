@@ -21,7 +21,7 @@ class CartController extends Controller
             'price'           => 'required|numeric',
             'user_id'         => 'required|exists:users,id',
             'quantity'        => 'required|numeric',
-            'product_id'   => ['required','exists:products,id',
+            'product_id'      => ['required','exists:products,id',
         ],
     ]);
         if ($validation->fails()) {
@@ -52,16 +52,13 @@ class CartController extends Controller
             'price'           => 'required|numeric',
             'user_id'         => 'required|exists:users,id',
             'quantity'        => 'required|numeric',
-            'product_id'   => ['required','exists:products,id',
+            'product_id'      => ['required','exists:products,id',
         ],
     ]);
         if ($validation->fails()) {
             return errorResponse($validation->errors()->first());
         }
-        $cart = Cart::find($id);
-        if (!$cart) {
-            return errorResponse('cart not found');
-        }
+        $cart = Cart::findOrFail($id);
         $cart->update($request->all(['product_id', 'user_id', 'quantity', 'price']));
         return successResponse($cart, 'Cart update successfully');
     }

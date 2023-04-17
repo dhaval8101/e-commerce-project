@@ -22,7 +22,7 @@ class Authcontroller extends Controller
     public function store(Request $request)
     {
         $validation = Validator::make($request->all(), [
-            'name'     => 'required',
+            'name'     => 'required|min:255',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|min:8',
             'phone'    => 'required',
@@ -106,7 +106,7 @@ class Authcontroller extends Controller
               'password'  => Hash::make($request->password)
           ]);
           return response()->json([
-            'message' => 'Password reset  successfully'
+            'message'    => 'Password reset  successfully'
         ]);
       }
       //search and pagination

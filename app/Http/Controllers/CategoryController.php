@@ -46,10 +46,7 @@ class CategoryController extends Controller
         if ($validation->fails()) {
             return errorResponse($validation->errors()->first());
         }
-        $category = Category::find($id);
-        if (!$category) {
-            return errorResponse('Category not found');
-        }
+        $category = Category::findOrFail($id);
         $category->update($request->all(['name']));
         return successResponse($category, 'Category update successfully');
     }

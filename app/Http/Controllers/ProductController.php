@@ -89,14 +89,10 @@ class ProductController extends Controller
                 }
             ]
         ]);
-
         if ($validation->fails()) {
             return errorResponse($validation->errors()->first());
         }
-        $product = Product::find($id);
-        if (!$product) {
-            return errorResponse('Product not found');
-        }
+        $product = Product::findOrFail($id);
         $product->update($request->all(['name', 'price', 'description', 'quantity', 'category_id', 'sub_category_id']));
         return successResponse($product, 'product update Successfully');
     }
@@ -122,7 +118,6 @@ class ProductController extends Controller
         $product  = Product::query()->orderBy('id', 'desc');
         // Define fields that can be searched
         $searchable_fields = ['sub_category_id', 'category_id', 'name'];
-
         return $this->list($request, $product, $searchable_fields);
     }
 }
