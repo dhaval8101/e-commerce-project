@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Product;
+use App\Traits\SearchableTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 class OrderController extends Controller
 {
+    use SearchableTrait;
     /**
      * Store a newly created resource in storage.
      */
@@ -25,15 +27,14 @@ class OrderController extends Controller
                 'pin_code'       => 'required',
                 'cart_id'        => 'required|exists:carts,id',
                 'user_id'        => 'required|exists:users,id',
-                'product_id'     => [
-                'required',
-                function($attribute, $value, $fail) {
-                    if (!Product::where('id', $value)->exists()) {
-                        $fail('Invalid product_id.');
-                    }
+                'product_id'     => ['required','exists:products,id',
+            function($attribute, $value, $fail) {
+                if (!Product::where('id', $value)->exists()) {
+                    $fail('Invalid product_id.');
                 }
-            ]
-        ]);
+            }
+        ]
+    ]);
           if ($validation->fails()) {
             return errorResponse($validation->errors()->first());
         }  
@@ -77,8 +78,7 @@ class OrderController extends Controller
             'pin_code'       => 'required',
             'cart_id'        => 'required|exists:carts,id',
             'user_id'        => 'required|exists:users,id',
-            'product_id'     => [
-            'required',
+            'product_id'     => ['required','exists:products,id',
             function($attribute, $value, $fail) {
                 if (!Product::where('id', $value)->exists()) {
                     $fail('Invalid product_id.');
@@ -86,7 +86,6 @@ class OrderController extends Controller
             }
         ]
     ]);
-    
     if ($validation->fails()) {
         return errorResponse($validation->errors()->first());
     }  
@@ -106,15 +105,23 @@ class OrderController extends Controller
         $order->delete();
         return successResponse($order,'order delete successfully');
     }
-        //search and pagination 
+    //search and pagination 
         public function index(Request $request)
         {
-        $cart  = Order::query();
+            $this->validate($request, [
+                'search'   => 'nullable|string',
+                'per_page' => 'nullable|integer',
+                'page'     => 'nullable|integer'
+            ]);
+            $order = Order::query()->orderBy('id', 'desc');
             if (Auth::user()->role == 'user') {
                 $user_id = Auth::user()->id;
-                $cart = $cart->where('user_id', $user_id);
+                $order->where('user_id', $user_id);
             }
-    $cart = $cart->get();
-     return successResponse('user cart details', $cart);
+            $order = $this->list($request, $order, null);
+            if ($order->isEmpty()) {
+                return errorResponse('Data Not found');
+            }
+            return successResponse(' order details', $order);
         }
     }

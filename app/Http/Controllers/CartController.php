@@ -21,16 +21,9 @@ class CartController extends Controller
             'price'           => 'required|numeric',
             'user_id'         => 'required|exists:users,id',
             'quantity'        => 'required|numeric',
-            'product_id'      => [
-                'required',
-                function ($attribute, $value, $fail) {
-                    if (!Product::where('id', $value)->exists()) {
-                        $fail('Invalid product_id.');
-                    }
-                }
-            ],
-        ]);
-
+            'product_id'   => ['required','exists:products,id',
+        ],
+    ]);
         if ($validation->fails()) {
             return errorResponse($validation->errors()->first());
         }
@@ -59,16 +52,9 @@ class CartController extends Controller
             'price'           => 'required|numeric',
             'user_id'         => 'required|exists:users,id',
             'quantity'        => 'required|numeric',
-            'product_id'      => [
-                'required',
-                function ($attribute, $value, $fail) {
-                    if (!Product::where('id', $value)->exists()) {
-                        $fail('Invalid product_id.');
-                    }
-                }
-            ],
-        ]);
-
+            'product_id'   => ['required','exists:products,id',
+        ],
+    ]);
         if ($validation->fails()) {
             return errorResponse($validation->errors()->first());
         }
@@ -79,17 +65,11 @@ class CartController extends Controller
         $cart->update($request->all(['product_id', 'user_id', 'quantity', 'price']));
         return successResponse($cart, 'Cart update successfully');
     }
-
     /**
      * Remove the specified resource from storage.
      */
     public function delete($id)
     {
-        $this->validate(request(), [
-            'per_page' => 'nullable|integer',
-            'page' => 'nullable|integer'
-        ]);
-
         $cart = Cart::findOrFail($id);
         $cart->delete();
         return successResponse($cart, 'Cart delete successfully');
@@ -97,12 +77,21 @@ class CartController extends Controller
     //search and pagination 
     public function index(Request $request)
     {
-    $cart  = Cart::query();
+        $this->validate($request, [
+            'search'   => 'nullable|string',
+            'per_page' => 'nullable|integer',
+            'page'     => 'nullable|integer'
+        ]);
+            $cart = Cart::query()->orderBy('id', 'desc');
         if (Auth::user()->role == 'user') {
             $user_id = Auth::user()->id;
-            $cart = $cart->where('user_id', $user_id);
+            $cart->where('user_id', $user_id);
         }
-$cart = $cart->get();
- return successResponse('user cart details', $cart);
+        $cart = $this->list($request, $cart, null);
+        if ($cart->isEmpty()) {
+            return errorResponse('Data Not found');
+        }
+        return successResponse('user cart details', $cart);
     }
+    
 }

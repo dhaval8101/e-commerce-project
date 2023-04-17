@@ -29,10 +29,10 @@ class UserController extends Controller
             'name'     => 'required',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|min:8',
-            'phone'     => 'required',
-            'address'     => 'required',
+            'phone'    => 'required',
+            'address'  => 'required',
             'city'     => 'required',
-            'pin_code'     => 'required',
+            'pin_code' => 'required',
         ]);
         if ($validation->fails()) {
             return errorResponse($validation->errors()->first());
@@ -49,12 +49,9 @@ class UserController extends Controller
      */
     public function delete($id)
     {
-        $user = User::where('id', $id)->first();
-        if ($user) {
-            $user->delete();
-            return successResponse('User delete successfully');
-        }
-        return errorResponse('User Already Deleted');
+        $user = User::findOrFail($id);
+        $user->delete();
+        return successResponse($user,'User delete successfully');
     }
     //Logout user
     public function logout(Request $request)
@@ -69,9 +66,9 @@ class UserController extends Controller
     public function changepassword(Request $request)
     {
         $validation = Validator::make($request->all(), [
-            'current_password' => 'required|current_password',
-            'password' => 'required|min:8',
-            'password_confirmation' => 'required|same:password',
+            'current_password'       => 'required|current_password',
+            'password'               => 'required|min:8',
+            'password_confirmation'  => 'required|same:password',
         ]);
         if ($validation->fails()) {
             return errorResponse($validation->errors()->first());
@@ -82,11 +79,11 @@ class UserController extends Controller
                 'password' => Hash::make($request->password),
             ]);
             return response()->json([
-                'message' => 'Password changed successfully',
+                'message'  => 'Password changed successfully',
             ]);
         }
         return response()->json([
-            'message' => 'Invalid current password',
+            'message'     => 'Invalid current password',
         ], 400);
     }
 }

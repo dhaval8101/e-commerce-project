@@ -67,15 +67,14 @@ class CategoryController extends Controller
     {
         // Validate input parameters
         $this->validate(request(), [
-            'search' => 'nullable|string',
+            'search'   => 'nullable|string',
             'per_page' => 'nullable|integer',
-            'page' => 'nullable|integer'
+            'page'     => 'nullable|integer'
         ]);
-
-        // Define fields that can be searched
+        $category = Category::query()->orderBy('id', 'desc');
         $searchable_fields = ['name'];
 
-        return $this->list($request, Category::class, $searchable_fields);
+        return $this->list($request,$category, $searchable_fields);
     }
 
 }

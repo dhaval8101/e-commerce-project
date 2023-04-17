@@ -15,12 +15,13 @@ class SubcategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+
     public function store(Request $request)
     {
         $validation = Validator::make($request->all(), [
             'name'        => 'required',
             'category_id' => [
-                'required',
+                'required', 'exists:categories,id',
                 function ($attribute, $value, $fail) {
                     if (!Category::where('id', $value)->exists()) {
                         $fail('Invalid category_id.');
@@ -53,7 +54,7 @@ class SubcategoryController extends Controller
         $validation = Validator::make($request->all(), [
             'name'        => 'required',
             'category_id' => [
-                'required',
+                'required', 'exists:categories,id',
                 function ($attribute, $value, $fail) {
                     if (!Category::where('id', $value)->exists()) {
                         $fail('Invalid category_id.');
@@ -61,7 +62,6 @@ class SubcategoryController extends Controller
                 }
             ]
         ]);
-
         if ($validation->fails()) {
             return errorResponse($validation->errors()->first());
         }
@@ -88,18 +88,13 @@ class SubcategoryController extends Controller
         // Validate input parameters
         $this->validate(request(), [
             'category_id' => 'nullable|integer',
-            'search' => 'nullable|string',
-            'per_page' => 'nullable|integer',
-            'page' => 'nullable|integer'
+            'search'      => 'nullable|string',
+            'per_page'    => 'nullable|integer',
+            'page'        => 'nullable|integer'
         ]);
-
-        // Define fields that can be searched
+        $subcategory = SubCategory::query()->orderBy('id', 'desc');
         $searchable_fields = ['category_id','name'];
 
-        return $this->list($request, SubCategory::class, $searchable_fields);
-    }
-
-    
-
-    
+        return $this->list($request, $subcategory, $searchable_fields);
+    }    
 }

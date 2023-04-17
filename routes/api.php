@@ -31,7 +31,7 @@ Route::controller(Authcontroller::class)->group(function () {
     Route::post('/login', 'login')->name('login');
     Route::post('/forgotPasswordLink', 'forgotPasswordLink');
     Route::post('/forgotPassword', 'forgotPassword');
-    Route::get('/list', 'index');   
+    Route::get('/list', 'index');
 });
 
 //User Api Route
@@ -81,6 +81,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/show/{id}', 'show')->middleware('role:admin|user');
         Route::put('/update/{id}', 'update')->middleware('role:admin');
         Route::delete('/delete/{id}', 'delete')->middleware('role:admin');
-        Route::get('/list', 'index')->middleware('role:admin|user');
+        Route::get('/list', 'index')->middleware('role:admin|user');    
     });
 });

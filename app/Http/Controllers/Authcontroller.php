@@ -25,10 +25,10 @@ class Authcontroller extends Controller
             'name'     => 'required',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|min:8',
-            'phone'     => 'required',
-            'address'     => 'required',
+            'phone'    => 'required',
+            'address'  => 'required',
             'city'     => 'required',
-            'pin_code'     => 'required',
+            'pin_code' => 'required',
         ]);
         if ($validation->fails()) {
             return errorResponse($validation->errors()->first());
@@ -61,7 +61,7 @@ class Authcontroller extends Controller
             $token = $user->createToken('Token')->plainTextToken;
             return response()->json([
                 'user' => $user,
-                'token' => $token
+                'token'=> $token
             ]);
         }
         return response()->json([
@@ -105,19 +105,22 @@ class Authcontroller extends Controller
           $user->update([
               'password'  => Hash::make($request->password)
           ]);
-          return 'Password Changed Successfully';    
+          return response()->json([
+            'message' => 'Password reset  successfully'
+        ]);
       }
       //search and pagination
-      public function index()
-      {
-          $this->ListingValidation();
-          $query = User::query();
-          $searchable_fields = ['name'];
-          $data = $this->serching($query, $searchable_fields);
-          return response()->json([
-              'success' => true,
-              'data'    => $data['query']->get(),
-              'total'   => $data['count']
-          ]);
-      }
+      public function index(Request $request)
+    {
+        // Validate input parameters
+        $this->validate(request(), [
+            'search'   => 'nullable|string',
+            'per_page' => 'nullable|integer',
+            'page'     => 'nullable|integer'
+        ]);
+        $user = User::query()->orderBy('id', 'desc');
+        $searchable_fields = ['name'];
+
+        return $this->list($request,$user, $searchable_fields);
+    }
 }
